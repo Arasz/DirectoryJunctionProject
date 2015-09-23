@@ -1,11 +1,12 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace DirectoryJunctionProject.ViewModel
 {
     static class CommandLineHelper
     {
-        public static string RunCmd(params string[] commands)
+        public async static Task<string> RunCmdAsync(params string[] commands)
         {
             string cmdOutputString;
 
@@ -24,7 +25,8 @@ namespace DirectoryJunctionProject.ViewModel
                 foreach (string command in commands)
                     cmdInput.WriteLine(command);
 
-                cmdOutputString = cmdOutput.ReadToEnd();
+                cmdInput.Close();
+                cmdOutputString = await cmdOutput.ReadToEndAsync();
             }
 
             return cmdOutputString ?? string.Empty;

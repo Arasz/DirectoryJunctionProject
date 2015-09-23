@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Diagnostics;
 
 namespace DirectoryJunctionProject.ViewModel
 {
@@ -50,6 +51,7 @@ namespace DirectoryJunctionProject.ViewModel
 
             CreateSelectTargetCommand();
             CreateSelectLinkDirectoryCommand();
+            CreateCreateJunctionCommand();
         }
 
         #region Events
@@ -97,12 +99,20 @@ namespace DirectoryJunctionProject.ViewModel
 
         private void CreateCreateJunctionCommand()
         {
-            SelectLinkDirectoryCommand = new RelayCommand<object>(CreateJunctionExecute, CanExecuteCreateJunctionCommand);
+            CreateJunctionCommand = new RelayCommand<object>(CreateJunctionExecute, CanExecuteCreateJunctionCommand);
         }
 
-        public void CreateJunctionExecute(object dummy)
+        public async void CreateJunctionExecute(object dummy)
         {
-            Environment.CommandLine
+            try
+            {
+                string output = await CommandLineHelper.RunCmdAsync(@"mklink /J " + $"\"{LinkDirectoryPath}\\{LinkName}\" \"{TargetPath}\" ");
+                Debug.Print(output);
+            }
+            catch(SystemException exception)
+            {
+                Debug.Print(exception.Message);
+            }
         }
 
         public bool CanExecuteCreateJunctionCommand(object dummy)
