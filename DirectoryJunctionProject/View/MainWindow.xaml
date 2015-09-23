@@ -6,9 +6,12 @@
         xmlns:local="clr-namespace:DirectoryJunctionProject"
         mc:Ignorable="d"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:viewmodel="clr-namespace:DirectoryJunctionProject.ViewModel"
         Title="DJCreator" Height="350" Width="525">
 
     <Window.Resources>
+        <viewmodel:DirJunctionViewModel x:Name="viewModel" x:Key="viewModel"/>
+        
         <sys:String x:Key="AppName">DJCreator</sys:String>
         <sys:String x:Key="TargetPathDescription">Path to target:</sys:String>
         <sys:String x:Key="SelectTargetButton">Select target</sys:String>
@@ -29,7 +32,7 @@
         </Style>
     </Window.Resources>
     
-    <Grid Background="White">
+    <Grid Background="White" DataContext="{StaticResource viewModel}">
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
@@ -39,8 +42,9 @@
         <StackPanel Grid.Row="0" Orientation="Vertical">
             <TextBlock Text="{StaticResource TargetPathDescription}" Margin="20,10"
                        Style="{StaticResource DescriptionTextBlockStyle}"/>
-            <TextBox Margin="20,0"/>
-            <Button Margin="20,10" Content="{StaticResource SelectTargetButton}" Style="{StaticResource ButtonStyle}"/>
+            <TextBox Margin="20,0" Text="{Binding TargetPath, Mode=TwoWay}"/>
+            <Button Margin="20,10,20,0" Content="{StaticResource SelectTargetButton}" 
+                    Style="{StaticResource ButtonStyle}" Command="{Binding SelectTargetCommand}"/>
         </StackPanel>
 
         <StackPanel Grid.Row="1" Orientation="Vertical">
@@ -56,11 +60,13 @@
                 
                 <TextBlock Grid.Column="0" Grid.Row="0" Text="{StaticResource LinkDirectoryPathDescription}" 
                            Margin="20,10,10,10" Style="{StaticResource DescriptionTextBlockStyle}"/>
-                <TextBox Grid.Column="0" Grid.Row="1" Margin="20,0,10,0"/>
+                <TextBox Grid.Column="0" Grid.Row="1" Margin="20,0,10,0" 
+                         Text="{Binding LinkDirectoryPath, Mode=TwoWay}"/>
                 
                 <TextBlock Grid.Column="1" Grid.Row="0" Text="{StaticResource LinkaNameDescription}" 
                            Margin="10,10,10,10" Style="{StaticResource DescriptionTextBlockStyle}"/>
-                <TextBox Grid.Column="1" Grid.Row="1" Margin="10,0,20,0" />
+                <TextBox Grid.Column="1" Grid.Row="1" Margin="10,0,20,0" 
+                         Text="{Binding LinkName, Mode=TwoWay}"/>
             </Grid>
             <Button Margin="20,10" Content="{StaticResource SelectLinkButton}"
                     Style="{StaticResource ButtonStyle}"/>
