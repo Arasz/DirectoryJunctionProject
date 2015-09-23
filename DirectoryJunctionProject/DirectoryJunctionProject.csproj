@@ -71,6 +71,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ViewModel\CommandLineHelper.cs" />
     <Compile Include="ViewModel\DirJunctionViewModel.cs" />
     <Compile Include="ViewModel\RelayCommand.cs" />
     <Compile Include="View\MainWindow.xaml.cs">

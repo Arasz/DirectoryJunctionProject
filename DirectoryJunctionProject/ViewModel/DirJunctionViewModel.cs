@@ -15,15 +15,22 @@ namespace DirectoryJunctionProject.ViewModel
     {
         public string LinkName { get; set; } = "Link name";
 
-        public string LinkDirectoryPath { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        private string _linkDirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        public string LinkDirectoryPath
+        {
+            get { return _linkDirectoryPath; }
+            set
+            {
+                _linkDirectoryPath = value;
+                OnPropertyChanged(nameof(LinkDirectoryPath));
+            }
+        }
 
         private string _targetPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         public string TargetPath
         {
             get
-            {
-                return _targetPath;
-            }
+            { return _targetPath; }
             set
             {
                 _targetPath = value;
@@ -42,6 +49,7 @@ namespace DirectoryJunctionProject.ViewModel
             };
 
             CreateSelectTargetCommand();
+            CreateSelectLinkDirectoryCommand();
         }
 
         #region Events
@@ -70,6 +78,38 @@ namespace DirectoryJunctionProject.ViewModel
         {
             if (_folderDialog.ShowDialog() == CommonFileDialogResult.Ok)
                 TargetPath = _folderDialog.FileName;
+        }
+
+        public ICommand SelectLinkDirectoryCommand { get; private set; }
+
+        private void CreateSelectLinkDirectoryCommand()
+        {
+            SelectLinkDirectoryCommand = new RelayCommand<object>(SelectLinkDirectoryExecute);
+        }
+
+        public void SelectLinkDirectoryExecute(object dummy)
+        {
+            if (_folderDialog.ShowDialog() == CommonFileDialogResult.Ok)
+                LinkDirectoryPath = _folderDialog.FileName;
+        }
+
+        public ICommand CreateJunctionCommand { get; private set; }
+
+        private void CreateCreateJunctionCommand()
+        {
+            SelectLinkDirectoryCommand = new RelayCommand<object>(CreateJunctionExecute, CanExecuteCreateJunctionCommand);
+        }
+
+        public void CreateJunctionExecute(object dummy)
+        {
+            Environment.CommandLine
+        }
+
+        public bool CanExecuteCreateJunctionCommand(object dummy)
+        {
+            return  Directory.Exists(TargetPath) &&
+                    Directory.Exists(LinkDirectoryPath) &&
+                    !Directory.Exists($"{LinkDirectoryPath}\\{LinkName}");
         }
         #endregion
     }

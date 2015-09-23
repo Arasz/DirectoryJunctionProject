@@ -69,7 +69,7 @@
                          Text="{Binding LinkName, Mode=TwoWay}"/>
             </Grid>
             <Button Margin="20,10" Content="{StaticResource SelectLinkButton}"
-                    Style="{StaticResource ButtonStyle}"/>
+                    Style="{StaticResource ButtonStyle}" Command="{Binding SelectLinkDirectoryCommand}"/>
         </StackPanel>
 
         <StackPanel Grid.Row="3">
