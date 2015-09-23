@@ -1,0 +1,76 @@
+﻿<Window x:Class="DirectoryJunctionProject.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DirectoryJunctionProject"
+        mc:Ignorable="d"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        Title="DJCreator" Height="350" Width="525">
+
+    <Window.Resources>
+        <sys:String x:Key="AppName">DJCreator</sys:String>
+        <sys:String x:Key="TargetPathDescription">Path to target:</sys:String>
+        <sys:String x:Key="SelectTargetButton">Select target</sys:String>
+        <sys:String x:Key="SelectLinkButton">Select link directory</sys:String>
+        <sys:String x:Key="CreateJunctionButton">Create junction</sys:String>
+        <sys:String x:Key="LinkDirectoryPathDescription">Path to link directory:</sys:String>
+        <sys:String x:Key="LinkaNameDescription">Link name:</sys:String>
+
+        <Style TargetType="TextBlock" x:Key="DescriptionTextBlockStyle">
+            <Setter Property="FontStyle" Value="Normal"/>
+            <Setter Property="FontFamily" Value="Agency FB" />
+            <Setter Property="FontSize" Value="20"/>
+        </Style>
+
+        <Style TargetType="Button" x:Key="ButtonStyle">
+            <Setter Property="Background" Value="Black"/>
+            <Setter Property="Foreground" Value="WhiteSmoke"/>
+        </Style>
+    </Window.Resources>
+    
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Vertical">
+            <TextBlock Text="{StaticResource TargetPathDescription}" Margin="20,10"
+                       Style="{StaticResource DescriptionTextBlockStyle}"/>
+            <TextBox Margin="20,0"/>
+            <Button Margin="20,10" Content="{StaticResource SelectTargetButton}" Style="{StaticResource ButtonStyle}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Vertical">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                
+                <TextBlock Grid.Column="0" Grid.Row="0" Text="{StaticResource LinkDirectoryPathDescription}" 
+                           Margin="20,10,10,10" Style="{StaticResource DescriptionTextBlockStyle}"/>
+                <TextBox Grid.Column="0" Grid.Row="1" Margin="20,0,10,0"/>
+                
+                <TextBlock Grid.Column="1" Grid.Row="0" Text="{StaticResource LinkaNameDescription}" 
+                           Margin="10,10,10,10" Style="{StaticResource DescriptionTextBlockStyle}"/>
+                <TextBox Grid.Column="1" Grid.Row="1" Margin="10,0,20,0" />
+            </Grid>
+            <Button Margin="20,10" Content="{StaticResource SelectLinkButton}"
+                    Style="{StaticResource ButtonStyle}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="3">
+            <Button Margin="20,20,20,20" Content="{StaticResource CreateJunctionButton}" 
+                    Style="{StaticResource ButtonStyle}"/>
+        </StackPanel>
+
+    </Grid>
+    
+</Window>
