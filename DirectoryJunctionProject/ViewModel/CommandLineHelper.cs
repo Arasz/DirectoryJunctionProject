@@ -23,7 +23,7 @@ namespace DirectoryJunctionProject.ViewModel
             using (StreamReader cmdOutput = process.StandardOutput)
             {
                 foreach (string command in commands)
-                    cmdInput.WriteLine(command);
+                     cmdInput.Write(command);
 
                 cmdInput.Close();
                 cmdOutputString = await cmdOutput.ReadToEndAsync();

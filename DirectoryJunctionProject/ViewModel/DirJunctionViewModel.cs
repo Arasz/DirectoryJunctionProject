@@ -12,11 +12,27 @@ using System.Diagnostics;
 
 namespace DirectoryJunctionProject.ViewModel
 {
+    //TODO: Write comments.
+    //TODO: Use some more async operations
+    //TODO: Write unit tests.
+    //TODO: Write model for application
+
+        /// <summary>
+        /// View model of application
+        /// </summary>
     class DirJunctionViewModel: INotifyPropertyChanged
     {
+        /// <summary>
+        /// Name of created directory link
+        /// </summary>
         public string LinkName { get; set; } = "Link name";
 
+        public bool OutputReady { get; set; } = false;
+
         private string _linkDirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        /// <summary>
+        /// Path to directory where link will be created
+        /// </summary>
         public string LinkDirectoryPath
         {
             get { return _linkDirectoryPath; }
@@ -28,6 +44,9 @@ namespace DirectoryJunctionProject.ViewModel
         }
 
         private string _targetPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        /// <summary>
+        /// Path to target (target - directory to which the link will be created )
+        /// </summary>
         public string TargetPath
         {
             get
@@ -39,6 +58,9 @@ namespace DirectoryJunctionProject.ViewModel
             }
         }
 
+        /// <summary>
+        /// Dialog used to choose target and link directory
+        /// </summary>
         private CommonFileDialog _folderDialog;
 
         public DirJunctionViewModel()
@@ -69,6 +91,9 @@ namespace DirectoryJunctionProject.ViewModel
 
         #region Commands
 
+        /// <summary>
+        /// Command used to select target
+        /// </summary>
         public ICommand SelectTargetCommand { get; private set; }
 
         private void CreateSelectTargetCommand()
@@ -82,6 +107,9 @@ namespace DirectoryJunctionProject.ViewModel
                 TargetPath = _folderDialog.FileName;
         }
 
+        /// <summary>
+        /// Command used to select link directory
+        /// </summary>
         public ICommand SelectLinkDirectoryCommand { get; private set; }
 
         private void CreateSelectLinkDirectoryCommand()
@@ -95,6 +123,9 @@ namespace DirectoryJunctionProject.ViewModel
                 LinkDirectoryPath = _folderDialog.FileName;
         }
 
+        /// <summary>
+        /// Command used to create directory junction
+        /// </summary>
         public ICommand CreateJunctionCommand { get; private set; }
 
         private void CreateCreateJunctionCommand()
@@ -104,21 +135,16 @@ namespace DirectoryJunctionProject.ViewModel
 
         public async void CreateJunctionExecute(object dummy)
         {
-            try
-            {
-                string output = await CommandLineHelper.RunCmdAsync(@"mklink /J " + $"\"{LinkDirectoryPath}\\{LinkName}\" \"{TargetPath}\" ");
-                Debug.Print(output);
-            }
-            catch(SystemException exception)
-            {
-                Debug.Print(exception.Message);
-            }
+           string output = await CommandLineHelper.RunCmdAsync(@"mklink /J " + $"\"{LinkDirectoryPath}\\{LinkName}\" \"{TargetPath}\" ");
+           OutputReady = true;
+            OnPropertyChanged(nameof(OutputReady));
         }
 
         public bool CanExecuteCreateJunctionCommand(object dummy)
         {
-            return  Directory.Exists(TargetPath) &&
+            return Directory.Exists(TargetPath) &&
                     Directory.Exists(LinkDirectoryPath) &&
+                    !string.IsNullOrEmpty(LinkName) &&
                     !Directory.Exists($"{LinkDirectoryPath}\\{LinkName}");
         }
         #endregion
