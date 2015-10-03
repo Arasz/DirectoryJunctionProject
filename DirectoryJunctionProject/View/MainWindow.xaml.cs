@@ -23,6 +23,9 @@ namespace DirectoryJunctionProject
         public MainWindow()
         {
             InitializeComponent();
+            var viewModel = (ViewModel.DirJunctionViewModel)mainWindow.Resources["viewModel"];
+            Closing += viewModel.OnWindowsClosing;
         }
+
     }
 }

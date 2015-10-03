@@ -12,7 +12,7 @@ namespace DirectoryJunctionProject.Model
     /// Contains state of application
     /// </summary>
     [XmlRoot]
-    class DirJunctionModel
+    public class DirJunctionModel
     {
         [XmlElement]
         public string LinkName { get; set; }

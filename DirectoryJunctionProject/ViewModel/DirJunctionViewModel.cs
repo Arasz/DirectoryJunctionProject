@@ -89,7 +89,7 @@ namespace DirectoryJunctionProject.ViewModel
                 _model = new DirJunctionModel()
                 {
                     LinkName = "NewLink",
-                    LinkDirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
+                    LinkDirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
                     TargetPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                     OutputReady = false,
                     CmdLineFeedback = "",
@@ -106,7 +106,6 @@ namespace DirectoryJunctionProject.ViewModel
             CreateSelectLinkDirectoryCommand();
             CreateCreateJunctionCommand();
             CreatePopupClickedCommand();
-            CreateWindowClosedCommand();
         }
 
         #region Events
@@ -197,17 +196,14 @@ namespace DirectoryJunctionProject.ViewModel
             OutputReady = !OutputReady;
             OnPropertyChanged(nameof(OutputReady));
         }
+
+        #endregion
+
+        #region Events Service
         /// <summary>
-        /// Command which services serialization on window close
+        /// Services serialization on window close
         /// </summary>
-        public ICommand WindowClosedCommand { get; private set; }
-
-        public void CreateWindowClosedCommand()
-        {
-            WindowClosedCommand = new RelayCommand<object>(WindowsClosedExecute);
-        }
-
-        public void WindowsClosedExecute(object dummy)
+        public void OnWindowsClosing(object sender, CancelEventArgs e)
         {
             Serialize();
         }
@@ -216,7 +212,7 @@ namespace DirectoryJunctionProject.ViewModel
 
         #region Serialization
 
-        readonly private string _serializationFilePath =Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + @"\state";
+        readonly private string _serializationFilePath =Directory.GetCurrentDirectory() + @"\state.xml";
 
         private void Serialize()
         {
@@ -230,7 +226,7 @@ namespace DirectoryJunctionProject.ViewModel
 
         private void Deserialize()
         {
-            if(File.Exists(_serializationFilePath))
+            if (File.Exists(_serializationFilePath))
             {
                 using (Stream deserializationStream = new FileStream(_serializationFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
