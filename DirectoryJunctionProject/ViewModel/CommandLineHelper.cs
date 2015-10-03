@@ -6,26 +6,20 @@ namespace DirectoryJunctionProject.ViewModel
 {
     static class CommandLineHelper
     {
-        public async static Task<string> RunCmdAsync(params string[] commands)
+        public async static Task<string> RunCmdAsync(string command)
         {
             string cmdOutputString;
 
-            ProcessStartInfo info = new ProcessStartInfo("cmd")
+            ProcessStartInfo info = new ProcessStartInfo("cmd.exe","/c"+command)
             {
                 UseShellExecute = false,
-                RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 CreateNoWindow = true
             };
 
             using (Process process = Process.Start(info))
-            using (StreamWriter cmdInput = process.StandardInput)
             using (StreamReader cmdOutput = process.StandardOutput)
             {
-                foreach (string command in commands)
-                     cmdInput.Write(command);
-
-                cmdInput.Close();
                 cmdOutputString = await cmdOutput.ReadToEndAsync();
             }
 

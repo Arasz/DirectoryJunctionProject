@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Diagnostics;
+using DirectoryJunctionProject.Model;
+using System.Xml.Serialization;
 
 namespace DirectoryJunctionProject.ViewModel
 {
@@ -22,49 +24,78 @@ namespace DirectoryJunctionProject.ViewModel
         /// </summary>
     class DirJunctionViewModel: INotifyPropertyChanged
     {
-        /// <summary>
-        /// Name of created directory link
-        /// </summary>
-        public string LinkName { get; set; } = "Link name";
 
-        public bool OutputReady { get; set; } = false;
-
-        private string _linkDirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        /// <summary>
-        /// Path to directory where link will be created
-        /// </summary>
-        public string LinkDirectoryPath
-        {
-            get { return _linkDirectoryPath; }
-            set
-            {
-                _linkDirectoryPath = value;
-                OnPropertyChanged(nameof(LinkDirectoryPath));
-            }
-        }
-
-        private string _targetPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        /// <summary>
-        /// Path to target (target - directory to which the link will be created )
-        /// </summary>
-        public string TargetPath
-        {
-            get
-            { return _targetPath; }
-            set
-            {
-                _targetPath = value;
-                OnPropertyChanged(nameof(TargetPath));
-            }
-        }
+        private DirJunctionModel _model;
 
         /// <summary>
         /// Dialog used to choose target and link directory
         /// </summary>
         private CommonFileDialog _folderDialog;
 
+        /// <summary>
+        /// Name of created directory link
+        /// </summary>
+        public string LinkName
+        {           
+            get { return _model.LinkName; }
+            set { _model.LinkName = value; }
+        }
+
+
+        public bool OutputReady
+        {
+            get { return _model.OutputReady; }
+            set { _model.OutputReady = value; }
+        }
+
+        public string CmdLineFeedback
+        {
+            get { return _model.CmdLineFeedback; }
+            private set { _model.CmdLineFeedback = value; }
+        }
+
+        /// <summary>
+        /// Path to directory where link will be created
+        /// </summary>
+        public string LinkDirectoryPath
+        {
+            get { return _model.LinkDirectoryPath; }
+            set
+            {
+                _model.LinkDirectoryPath = value;
+                OnPropertyChanged(nameof(LinkDirectoryPath));
+            }
+        }
+
+        /// <summary>
+        /// Path to target (target - directory to which the link will be created )
+        /// </summary>
+        public string TargetPath
+        {
+            get
+            { return _model.TargetPath; }
+            set
+            {
+                _model.TargetPath = value;
+                OnPropertyChanged(nameof(TargetPath));
+            }
+        }
+
         public DirJunctionViewModel()
         {
+            Deserialize();
+            if(_model == null)
+            {
+                _model = new DirJunctionModel()
+                {
+                    LinkName = "NewLink",
+                    LinkDirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
+                    TargetPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                    OutputReady = false,
+                    CmdLineFeedback = "",
+                };
+            }
+
             _folderDialog = new CommonOpenFileDialog()
             {
                 IsFolderPicker = true,
@@ -74,6 +105,8 @@ namespace DirectoryJunctionProject.ViewModel
             CreateSelectTargetCommand();
             CreateSelectLinkDirectoryCommand();
             CreateCreateJunctionCommand();
+            CreatePopupClickedCommand();
+            CreateWindowClosedCommand();
         }
 
         #region Events
@@ -135,9 +168,10 @@ namespace DirectoryJunctionProject.ViewModel
 
         public async void CreateJunctionExecute(object dummy)
         {
-           string output = await CommandLineHelper.RunCmdAsync(@"mklink /J " + $"\"{LinkDirectoryPath}\\{LinkName}\" \"{TargetPath}\" ");
-           OutputReady = true;
+            CmdLineFeedback = await  CommandLineHelper.RunCmdAsync(@"mklink /J " + $"\"{LinkDirectoryPath}\\{LinkName} \" \"{TargetPath} \" ");
+            OutputReady = !OutputReady;
             OnPropertyChanged(nameof(OutputReady));
+            OnPropertyChanged(nameof(CmdLineFeedback));
         }
 
         public bool CanExecuteCreateJunctionCommand(object dummy)
@@ -147,6 +181,66 @@ namespace DirectoryJunctionProject.ViewModel
                     !string.IsNullOrEmpty(LinkName) &&
                     !Directory.Exists($"{LinkDirectoryPath}\\{LinkName}");
         }
+
+        /// <summary>
+        /// Command which services click on pop-up button
+        /// </summary>
+        public ICommand PopupClickedCommand { get; private set; }
+
+        public void CreatePopupClickedCommand()
+        {
+            PopupClickedCommand = new RelayCommand<object>(PopupClickedCommandExecute);
+        }
+
+        public void PopupClickedCommandExecute(object dummy)
+        {
+            OutputReady = !OutputReady;
+            OnPropertyChanged(nameof(OutputReady));
+        }
+        /// <summary>
+        /// Command which services serialization on window close
+        /// </summary>
+        public ICommand WindowClosedCommand { get; private set; }
+
+        public void CreateWindowClosedCommand()
+        {
+            WindowClosedCommand = new RelayCommand<object>(WindowsClosedExecute);
+        }
+
+        public void WindowsClosedExecute(object dummy)
+        {
+            Serialize();
+        }
+
+        #endregion
+
+        #region Serialization
+
+        readonly private string _serializationFilePath =Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + @"\state";
+
+        private void Serialize()
+        {
+            using (Stream serializationStream = new FileStream(_serializationFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(DirJunctionModel));
+                serializer.Serialize(serializationStream, _model);
+            }
+
+        }
+
+        private void Deserialize()
+        {
+            if(File.Exists(_serializationFilePath))
+            {
+                using (Stream deserializationStream = new FileStream(_serializationFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    XmlSerializer serializer = new XmlSerializer(typeof(DirJunctionModel));
+                    _model = (DirJunctionModel)serializer.Deserialize(deserializationStream);
+                }
+            }
+        }
+
+
         #endregion
     }
 }

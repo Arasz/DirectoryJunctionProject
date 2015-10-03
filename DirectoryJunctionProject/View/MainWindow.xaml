@@ -7,7 +7,8 @@
         mc:Ignorable="d"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:viewmodel="clr-namespace:DirectoryJunctionProject.ViewModel"
-        Title="DJCreator" Height="350" Width="525">
+        Title="DJCreator" Height="350" Width="525" x:Name="mainWindow" 
+        >
 
     <Window.Resources>
         <viewmodel:DirJunctionViewModel x:Name="viewModel" x:Key="viewModel"/>
@@ -31,7 +32,10 @@
             <Setter Property="Foreground" Value="WhiteSmoke"/>
         </Style>
     </Window.Resources>
-    
+
+    <Window.CommandBindings>
+        <CommandBinding Command="{Binding Source={StaticResource viewModel}, Path=WindowClosedCommand}"/>
+    </Window.CommandBindings>
     
     
     <Grid Background="White" DataContext="{StaticResource viewModel}">
@@ -78,9 +82,19 @@
             <Button Margin="20,20,20,20" Content="{StaticResource CreateJunctionButton}" 
                     Style="{StaticResource ButtonStyle}" Command="{Binding CreateJunctionCommand}"/>
         </StackPanel>
-        
-        <Popup Placement="Center " x:Name="popup" IsOpen="{Binding OutputReady}">
-            <TextBlock>TESt</TextBlock>
+
+        <Popup Placement="Center" AllowsTransparency="True" 
+               PlacementTarget="{Binding ElementName=mainWindow}" IsOpen="{Binding OutputReady}" 
+               MinWidth="150"
+               MinHeight="50"
+               x:Name="popup">
+            <Border BorderThickness="2" BorderBrush="Gray" Background="White">
+                <StackPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Orientation="Vertical">
+                    <TextBlock VerticalAlignment="Stretch" TextAlignment="Center" Text="{Binding CmdFeedback}"/>
+                    <Button Content="Close" Style="{StaticResource ButtonStyle}" Margin="20,5,20,5" 
+                            Command="{Binding PopupClickedCommand}"/>
+                </StackPanel>
+            </Border>
         </Popup>
     </Grid>
 
